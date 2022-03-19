@@ -2,6 +2,7 @@ package com.gustavo.schedule.domain.service;
 
 import com.gustavo.schedule.domain.entity.Patient;
 import com.gustavo.schedule.domain.repository.PatientRepository;
+import com.gustavo.schedule.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,33 @@ public class PatientService {
     private final PatientRepository repository;
 
     public Patient save(Patient patient) {
-        //TODO: validar se o CPF já existe.
+
+        boolean existCpf = false;
+        boolean existEmail = false;
+
+        Optional<Patient> optPacient = repository.findByCpf(patient.getCpf());
+
+        if (optPacient.isPresent()) {
+            if (!optPacient.get().getId().equals(patient.getId())) {
+                existCpf = true;
+            }
+        }
+
+        if (existCpf) {
+            throw new BusinessException("Cpf already registered");
+        }
+
+        optPacient = repository.findByEmail(patient.getEmail());
+
+        if (optPacient.isPresent()) {
+            if (!optPacient.get().getId().equals(patient.getId())) {
+                existEmail = true;
+            }
+        }
+
+        if (existEmail) {
+            throw new BusinessException("Email already registered");
+        }
 
         return repository.save(patient);
     }
