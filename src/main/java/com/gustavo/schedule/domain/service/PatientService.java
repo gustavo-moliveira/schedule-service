@@ -33,7 +33,7 @@ public class PatientService {
         }
 
         if (existCpf) {
-            throw new BusinessException("Cpf already registered");
+            throw new BusinessException("Cpf already registered!");
         }
 
         optPacient = repository.findByEmail(patient.getEmail());
@@ -45,15 +45,26 @@ public class PatientService {
         }
 
         if (existEmail) {
-            throw new BusinessException("Email already registered");
+            throw new BusinessException("Email already registered!");
         }
 
         return repository.save(patient);
     }
 
+    public Patient update(Long id, Patient patient) {
+        Optional<Patient> optPatient = this.searchForId(id);
+
+        if (optPatient.isEmpty()) {
+            throw new BusinessException("Unregistered patient!");
+        }
+
+        patient.setId(id);
+
+        return save(patient);
+    }
+
     public List<Patient> listAll() {
         return repository.findAll();
-
     }
 
     public Optional<Patient> searchForId(Long id) {
